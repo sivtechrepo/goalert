@@ -17,6 +17,7 @@ export function ListHeader(props: {
   const { headerNote, headerAction, cardHeader } = props
   return (
     <React.Fragment>
+      {cardHeader}
       {(headerNote || headerAction) && (
         <CardHeader
           subheader={
@@ -27,7 +28,6 @@ export function ListHeader(props: {
           action={headerAction}
         />
       )}
-      {cardHeader}
     </React.Fragment>
   )
 }

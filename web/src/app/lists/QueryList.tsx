@@ -148,21 +148,21 @@ export default function QueryList(props: QueryListProps): JSX.Element {
     return (
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Card>
-            <ListHeader
-              cardHeader={props.cardHeader}
-              headerNote={props.headerNote}
-              headerAction={props.headerAction}
-            />
-            <ControlledPaginatedList
-              {...listProps}
-              items={items}
-              itemsPerPage={queryVariables.input.first}
-              loadMore={loadMore}
-              isLoading={!data && loading}
-              noSearch={noSearch}
-            />
-          </Card>
+          <ControlledPaginatedList
+            {...listProps}
+            items={items}
+            itemsPerPage={queryVariables.input.first}
+            loadMore={loadMore}
+            isLoading={!data && loading}
+            noSearch={noSearch}
+            listHeader={
+              <ListHeader
+                cardHeader={props.cardHeader}
+                headerNote={props.headerNote}
+                headerAction={props.headerAction}
+              />
+            }
+          />
         </Grid>
       </Grid>
     )
