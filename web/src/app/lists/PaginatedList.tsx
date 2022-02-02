@@ -7,7 +7,6 @@ import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 import Typography from '@mui/material/Typography'
 import LeftIcon from '@mui/icons-material/ChevronLeft'
 import RightIcon from '@mui/icons-material/ChevronRight'
@@ -161,6 +160,7 @@ function LoadingItem(props: { dense?: boolean }): JSX.Element {
 }
 
 export interface PaginatedListProps {
+  listHeader?: ReactNode
   // cardHeader will be displayed at the top of the card
   cardHeader?: ReactNode
 
@@ -198,9 +198,6 @@ export interface PaginatedListItemProps {
 
 export function PaginatedList(props: PaginatedListProps): JSX.Element {
   const {
-    cardHeader,
-    headerNote,
-    headerAction,
     items = [],
     itemsPerPage = ITEMS_PER_PAGE,
     infiniteScroll,
@@ -357,27 +354,7 @@ export function PaginatedList(props: PaginatedListProps): JSX.Element {
   const onNext = hasNextPage ? handleNextPage : undefined
 
   function renderList(): ReactElement {
-    return (
-      <List data-cy='apollo-list'>
-        {(headerNote || headerAction) && (
-          <ListItem>
-            {headerNote && (
-              <ListItemText
-                className={classes.headerNote}
-                disableTypography
-                secondary={
-                  <Typography color='textSecondary'>{headerNote}</Typography>
-                }
-              />
-            )}
-            {headerAction && (
-              <ListItemSecondaryAction>{headerAction}</ListItemSecondaryAction>
-            )}
-          </ListItem>
-        )}
-        {renderListItems()}
-      </List>
-    )
+    return <List data-cy='apollo-list'>{renderListItems()}</List>
   }
 
   function renderAsInfiniteScroll(): ReactElement {
@@ -419,10 +396,7 @@ export function PaginatedList(props: PaginatedListProps): JSX.Element {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Card>
-          {cardHeader}
-          {infiniteScroll ? renderAsInfiniteScroll() : renderList()}
-        </Card>
+        {infiniteScroll ? renderAsInfiniteScroll() : renderList()}
       </Grid>
       {!infiniteScroll && (
         <PageControls onBack={onBack} onNext={onNext} isLoading={isLoading} />

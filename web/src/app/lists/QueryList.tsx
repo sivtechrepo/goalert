@@ -5,7 +5,7 @@ import {
   QueryResult,
   DocumentNode,
 } from '@apollo/client'
-import { Grid } from '@mui/material'
+import { Card, Grid } from '@mui/material'
 import { once } from 'lodash'
 import { useLocation } from 'react-router-dom'
 import { useURLParam } from '../actions/hooks'
@@ -16,6 +16,7 @@ import { GraphQLClientWithErrors } from '../apollo'
 import ControlledPaginatedList, {
   ControlledPaginatedListProps,
 } from './ControlledPaginatedList'
+import { ListHeader } from './ListHeader'
 
 // any && object type map
 // used for objects with unknown key/values from parent
@@ -146,14 +147,23 @@ export default function QueryList(props: QueryListProps): JSX.Element {
   ) {
     return (
       <Grid container spacing={2}>
-        <ControlledPaginatedList
-          {...listProps}
-          items={items}
-          itemsPerPage={queryVariables.input.first}
-          loadMore={loadMore}
-          isLoading={!data && loading}
-          noSearch={noSearch}
-        />
+        <Grid item xs={12}>
+          <Card>
+            <ListHeader
+              cardHeader={props.cardHeader}
+              headerNote={props.headerNote}
+              headerAction={props.headerAction}
+            />
+            <ControlledPaginatedList
+              {...listProps}
+              items={items}
+              itemsPerPage={queryVariables.input.first}
+              loadMore={loadMore}
+              isLoading={!data && loading}
+              noSearch={noSearch}
+            />
+          </Card>
+        </Grid>
       </Grid>
     )
   }
@@ -161,14 +171,21 @@ export default function QueryList(props: QueryListProps): JSX.Element {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <PaginatedList
-          {...listProps}
-          key={urlKey}
-          items={items}
-          itemsPerPage={queryVariables.input.first}
-          loadMore={loadMore}
-          isLoading={!data && loading}
-        />
+        <Card>
+          <ListHeader
+            cardHeader={props.cardHeader}
+            headerNote={props.headerNote}
+            headerAction={props.headerAction}
+          />
+          <PaginatedList
+            {...listProps}
+            key={urlKey}
+            items={items}
+            itemsPerPage={queryVariables.input.first}
+            loadMore={loadMore}
+            isLoading={!data && loading}
+          />
+        </Card>
       </Grid>
     </Grid>
   )
