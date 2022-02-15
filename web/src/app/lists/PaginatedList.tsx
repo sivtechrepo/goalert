@@ -71,6 +71,7 @@ function PageControls(props: {
 }): JSX.Element {
   const classes = useStyles()
   const { isLoading, onBack, onNext } = props
+  // console.log('IsLoading: ', isLoading)
 
   return (
     <Grid

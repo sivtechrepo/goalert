@@ -6,6 +6,7 @@ import { DateTime } from 'luxon'
 import ScheduleOverrideForm from './ScheduleOverrideForm'
 import { fieldErrors, nonFieldErrors } from '../util/errutil'
 import useOverrideNotices from './useOverrideNotices'
+import { useHistory } from 'react-router-dom'
 
 export const variantDetails = {
   add: {
@@ -50,6 +51,7 @@ const mutation = gql`
   }
 `
 export default function ScheduleOverrideCreateDialog(props) {
+  const history = useHistory()
   const [value, setValue] = useState({
     addUserID: '',
     removeUserID: '',
@@ -68,6 +70,8 @@ export default function ScheduleOverrideCreateDialog(props) {
       },
     },
     onCompleted: props.onClose,
+    // schedules/de074300-a9e1-4686-adf8-1f4a2cbd9921/overrides
+    // onCompleted: (data) => history.push(`/schedules/${props.scheduleID}/overrides`),
   })
 
   return (

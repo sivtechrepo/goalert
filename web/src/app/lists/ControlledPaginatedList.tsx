@@ -239,7 +239,6 @@ export default function ControlledPaginatedList(
     if (itemsHaveID(items)) {
       return items.map((item) => ({ ...item, icon: getItemIcon(item) }))
     }
-
     return items
   }
 

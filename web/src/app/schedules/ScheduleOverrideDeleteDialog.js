@@ -38,7 +38,6 @@ export default function ScheduleOverrideDeleteDialog({ overrideID, onClose }) {
   const [zone] = useURLParam('tz', 'local')
 
   function renderDialog(data, commit, mutStatus) {
-    const { loading, error } = mutStatus
     const { addUser, removeUser, start, end } = data
 
     const isReplace = addUser && removeUser

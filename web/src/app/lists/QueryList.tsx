@@ -16,6 +16,7 @@ import { GraphQLClientWithErrors } from '../apollo'
 import ControlledPaginatedList, {
   ControlledPaginatedListProps,
 } from './ControlledPaginatedList'
+import { ImageNotSupportedSharp } from '@mui/icons-material'
 
 // any && object type map
 // used for objects with unknown key/values from parent
@@ -128,8 +129,10 @@ export default function QueryList(props: QueryListProps): JSX.Element {
 
   const nodes = data?.data?.nodes ?? []
   const items = nodes.map(mapDataNode)
+  console.log('Items Length: ', items.length)
   let loadMore: ((numberToLoad?: number) => void) | undefined
 
+  // TODO, only displays when on pg1, not on pg2, which is correct behaviour
   if (data?.data?.pageInfo?.hasNextPage) {
     loadMore = buildFetchMore(
       fetchMore,
@@ -144,6 +147,8 @@ export default function QueryList(props: QueryListProps): JSX.Element {
     props.secondaryActions ||
     !props.noSearch
   ) {
+    // not printing from here
+
     return (
       <Grid container spacing={2}>
         <ControlledPaginatedList
@@ -158,6 +163,9 @@ export default function QueryList(props: QueryListProps): JSX.Element {
     )
   }
 
+  console.log('Going QueryL:PagnL isLoading:', loading) // problem when T
+  // console.log('!data: ', !data) // problem when T
+  // only time isLoading=T, is when data=F && loading=T
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
