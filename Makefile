@@ -70,13 +70,13 @@ cypress: bin/goalert bin/psql-lite node_modules web/src/schema.d.ts
 	yarn cypress install
 
 cy-wide: cypress
-	CONTAINER_TOOL=$(CONTAINER_TOOL) CYPRESS_viewportWidth=1440 CYPRESS_viewportHeight=900 go run ./devtools/runproc -f Procfile.cypress
+	CONTAINER_TOOL=$(CONTAINER_TOOL) CYPRESS_viewportWidth=1440 CYPRESS_viewportHeight=900 GOALERT_VERSION=$(GIT_VERSION) go run ./devtools/runproc -f Procfile.cypress
 cy-mobile: cypress
-	CONTAINER_TOOL=$(CONTAINER_TOOL) CYPRESS_viewportWidth=375 CYPRESS_viewportHeight=667 go run ./devtools/runproc -f Procfile.cypress
+	CONTAINER_TOOL=$(CONTAINER_TOOL) CYPRESS_viewportWidth=375 CYPRESS_viewportHeight=667 GOALERT_VERSION=$(GIT_VERSION) go run ./devtools/runproc -f Procfile.cypress
 cy-wide-prod: web/src/build/static/app.js cypress
-	CONTAINER_TOOL=$(CONTAINER_TOOL) CYPRESS_viewportWidth=1440 CYPRESS_viewportHeight=900 CY_ACTION=$(CY_ACTION) go run ./devtools/runproc -f Procfile.cypress.prod
+	CONTAINER_TOOL=$(CONTAINER_TOOL) CYPRESS_viewportWidth=1440 CYPRESS_viewportHeight=900 CY_ACTION=$(CY_ACTION) GOALERT_VERSION=$(GIT_VERSION) go run ./devtools/runproc -f Procfile.cypress.prod
 cy-mobile-prod: web/src/build/static/app.js cypress
-	CONTAINER_TOOL=$(CONTAINER_TOOL) CYPRESS_viewportWidth=375 CYPRESS_viewportHeight=667 CY_ACTION=$(CY_ACTION) go run ./devtools/runproc -f Procfile.cypress.prod
+	CONTAINER_TOOL=$(CONTAINER_TOOL) CYPRESS_viewportWidth=375 CYPRESS_viewportHeight=667 CY_ACTION=$(CY_ACTION) GOALERT_VERSION=$(GIT_VERSION) go run ./devtools/runproc -f Procfile.cypress.prod
 cy-wide-prod-run: web/src/build/static/app.js cypress
 	make cy-wide-prod CY_ACTION=run CONTAINER_TOOL=$(CONTAINER_TOOL)
 cy-mobile-prod-run: web/src/build/static/app.js cypress

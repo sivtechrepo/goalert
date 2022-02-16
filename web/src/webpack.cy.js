@@ -6,6 +6,7 @@ const CopyPlugin = require('copy-webpack-plugin')
 // Constants
 const APP = path.join(__dirname, 'app')
 const BUILD = path.join(__dirname, 'build')
+const CYPRESS = path.join(__dirname, 'cypress')
 
 module.exports = () => ({
   mode: 'development',
@@ -58,13 +59,17 @@ module.exports = () => ({
     ],
   },
 
+  infrastructureLogging: {
+    level: 'warn',
+  },
+
   // Source maps used for debugging information
   devtool: 'eval-source-map',
   // webpack-dev-server configuration
   devServer: {
-    port: 3035,
+    port: 3045,
     allowedHosts: 'all',
-    watchFiles: [APP],
+    watchFiles: [APP, CYPRESS],
 
     devMiddleware: {
       stats: 'errors-only',
@@ -101,6 +106,10 @@ module.exports = () => ({
         process.env.GOALERT_VERSION,
       )};`,
       raw: true,
+    }),
+    new webpack.DefinePlugin({
+      // hide devtools advertisement (spams test console)
+      __REACT_DEVTOOLS_GLOBAL_HOOK__: '({ isDisabled: true })',
     }),
   ],
 })

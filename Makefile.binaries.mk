@@ -77,9 +77,9 @@ container-goalert:  container-goalert-amd64 container-goalert-arm container-goal
 $(BIN_DIR)/build/integration/cypress.json: web/src/cypress.json
 	sed 's/\.ts/\.js/' web/src/cypress.json >$@
 
-$(BIN_DIR)/build/integration/cypress: node_modules web/src/webpack.cypress.js $(BIN_DIR)/build/integration/cypress.json $(shell find ./web/src/cypress)
+$(BIN_DIR)/build/integration/cypress: node_modules web/src/webpack.prod.cy.js $(BIN_DIR)/build/integration/cypress.json $(shell find ./web/src/cypress)
 	rm -rf $@
-	yarn workspace goalert-web webpack --config webpack.cypress.js
+	yarn workspace goalert-web webpack --config webpack.prod.cy.js
 	cp -r web/src/cypress/fixtures $@/
 	touch $@
 

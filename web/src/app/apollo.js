@@ -12,6 +12,9 @@ import { POLL_INTERVAL } from './config'
 import promiseBatch from './util/promiseBatch'
 import { pathPrefix } from './env'
 
+// hide devtools advertisement (spams test console)
+window.__APOLLO_DEVTOOLS_GLOBAL_HOOK__ = true
+
 let pendingMutations = 0
 window.onbeforeunload = function (e) {
   if (!pendingMutations) {
