@@ -1,0 +1,12 @@
+{
+  "name": "goalert-explore",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "build": "esbuild --define:global=window --outfile=../../graphql2/graphqlapp/playground.js --bundle --minify explore.tsx"
+  },
+  "dependencies": {
+    "graphiql": "1.5.19"
+  }
+}
