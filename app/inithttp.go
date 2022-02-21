@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/target/goalert/config"
 	"github.com/target/goalert/genericapi"
 	"github.com/target/goalert/grafana"
+	"github.com/target/goalert/graphql2/explore"
 	"github.com/target/goalert/mailgun"
 	"github.com/target/goalert/notification/twilio"
 	prometheus "github.com/target/goalert/prometheusalertmanager"
@@ -169,7 +171,11 @@ func (app *App) initHTTP(ctx context.Context) error {
 	})
 
 	mux.Handle("/api/graphql", app.graphql2.Handler())
-	mux.HandleFunc("/api/graphql/explore", app.graphql2.PlayHandler)
+
+	if _, err := os.Stat("../graphql2/explore/build/explore.html"); err == nil {
+		// explore.html exists
+		mux.HandleFunc("/api/graphql/explore", explore.Handler)
+	}
 
 	mux.HandleFunc("/api/v2/config", app.ConfigStore.ServeConfig)
 

@@ -4,7 +4,6 @@ import (
 	context "context"
 	"database/sql"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 	"time"
@@ -86,30 +85,6 @@ type App struct {
 	TimeZoneStore *timezone.Store
 
 	FormatDestFunc func(context.Context, notification.DestType, string) string
-}
-
-func (a *App) PlayHandler(w http.ResponseWriter, req *http.Request) {
-	var data struct {
-		ApplicationName string
-		PlayJS          template.JS
-		PlayCSS         template.CSS
-	}
-
-	ctx := req.Context()
-	err := permission.LimitCheckAny(ctx)
-	if errutil.HTTPError(ctx, w, err) {
-		return
-	}
-
-	cfg := config.FromContext(ctx)
-	data.ApplicationName = cfg.ApplicationName()
-	data.PlayJS = template.JS(playJS)
-	data.PlayCSS = template.CSS(playCSS)
-
-	err = playTmpl.Execute(w, data)
-	if errutil.HTTPError(ctx, w, err) {
-		return
-	}
 }
 
 type fieldErr struct {
