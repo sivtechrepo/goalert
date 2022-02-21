@@ -120,8 +120,6 @@ EXPLORE_BUILD = $(shell find graphql2/explore/build)
 $(EXPLORE_BUILD): web/explore/explore.tsx
 	yarn workspace goalert-explore run build
 
-graphql2/graphqlapp/playground.html: graphql2/graphqlapp/playground.js graphql2/graphqlapp/playground.css
-
 graphql2/mapconfig.go: $(CFGPARAMS) config/config.go graphql2/generated.go devtools/configparams/*
 	(cd ./graphql2 && go run ../devtools/configparams -out mapconfig.go && go run golang.org/x/tools/cmd/goimports -w ./mapconfig.go) || go generate ./graphql2
 
@@ -156,8 +154,7 @@ tools:
 	go get -u honnef.co/go/tools/cmd/staticcheck
 	go get -u golang.org/x/tools/cmd/stringer
 
-PACKAGE_JSONS = $(shell find . -type f -name "package.json" -not -path "**node_modules**")
-yarn.lock: $(PACKAGE_JSONS) Makefile
+yarn.lock: package.json web/src/package.json web/explore/package.json Makefile
 	yarn --no-progress --silent --check-files && touch $@
 
 node_modules/.yarn-integrity: yarn.lock Makefile
