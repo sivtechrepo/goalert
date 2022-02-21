@@ -1,6 +1,7 @@
 package explore
 
 import (
+	"embed"
 	_ "embed"
 	"html/template"
 	"net/http"
@@ -13,11 +14,8 @@ import (
 //go:embed explore.html
 var htmlStr string
 
-//go:embed build/explore.css
-var cssStr string
-
-//go:embed build/explore.js
-var jsStr string
+//go:embed build
+var build embed.FS
 
 var playTmpl = template.Must(template.New("graphqlPlayground").Parse(htmlStr))
 
@@ -34,10 +32,19 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	jsData, err := build.ReadFile("build/explore/explore.js")
+	if err != nil {
+		return
+	}
+	cssData, err := build.ReadFile("build/explore/explore.css")
+	if err != nil {
+		return
+	}
+
 	cfg := config.FromContext(ctx)
 	data.ApplicationName = cfg.ApplicationName()
-	data.PlayJS = template.JS(jsStr)
-	data.PlayCSS = template.CSS(cssStr)
+	data.PlayJS = template.JS(string(jsData))
+	data.PlayCSS = template.CSS(string(string(cssData)))
 
 	err = playTmpl.Execute(w, data)
 	if errutil.HTTPError(ctx, w, err) {

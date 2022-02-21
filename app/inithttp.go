@@ -177,6 +177,8 @@ func (app *App) initHTTP(ctx context.Context) error {
 	if js_err == nil && csserr == nil {
 		// files exist
 		mux.HandleFunc("/api/graphql/explore", explore.Handler)
+	} else {
+		mux.HandleFunc("/api/graphql/explore", explore.Handler)
 	}
 
 	mux.HandleFunc("/api/v2/config", app.ConfigStore.ServeConfig)
