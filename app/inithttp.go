@@ -172,8 +172,10 @@ func (app *App) initHTTP(ctx context.Context) error {
 
 	mux.Handle("/api/graphql", app.graphql2.Handler())
 
-	if _, err := os.Stat("../graphql2/explore/build/explore.html"); err == nil {
-		// explore.html exists
+	_, js_err := os.Stat("../graphql2/explore/build/explore.js")
+	_, csserr := os.Stat("../graphql2/explore/build/explore.css")
+	if js_err == nil && csserr == nil {
+		// files exist
 		mux.HandleFunc("/api/graphql/explore", explore.Handler)
 	}
 

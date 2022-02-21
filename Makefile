@@ -116,7 +116,8 @@ check: force-yarn generate node_modules
 
 check-all: check test smoketest cy-wide-prod-run cy-mobile-prod-run
 
-graphql2/graphqlapp/playground.js graphql2/graphqlapp/playground.css: web/explore/explore.tsx
+EXPLORE_BUILD = $(shell find graphql2/explore/build)
+$(EXPLORE_BUILD): web/explore/explore.tsx
 	yarn workspace goalert-explore run build
 
 graphql2/graphqlapp/playground.html: graphql2/graphqlapp/playground.js graphql2/graphqlapp/playground.css
@@ -155,7 +156,8 @@ tools:
 	go get -u honnef.co/go/tools/cmd/staticcheck
 	go get -u golang.org/x/tools/cmd/stringer
 
-yarn.lock: package.json web/src/package.json web/explore/package.json Makefile
+PACKAGE_JSONS = $(shell find . -type f -name "package.json" -not -path "**node_modules**")
+yarn.lock: $(PACKAGE_JSONS) Makefile
 	yarn --no-progress --silent --check-files && touch $@
 
 node_modules/.yarn-integrity: yarn.lock Makefile
@@ -196,7 +198,7 @@ resetdb: config.json.bak
 	go run ./devtools/resetdb --no-migrate
 
 clean:
-	rm -rf bin node_modules web/src/node_modules web/explore/node_modules web/src/build/static
+	rm -rf bin node_modules web/src/node_modules web/explore/node_modules web/src/build/static graphql2/explore/build/explore.js graphql2/explore/build/explore.css
 
 lint: $(GOALERT_DEPS)
 	go run github.com/golang/lint/golint $(shell go list ./...)
