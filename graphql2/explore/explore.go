@@ -10,10 +10,10 @@ import (
 	"github.com/target/goalert/util/errutil"
 )
 
-//go:embed build/playground.css
+//go:embed build/explore.css
 var playCSS string
 
-//go:embed build/playground.js
+//go:embed build/explore.js
 var playJS string
 
 var playTmpl = template.Must(template.New("graphqlPlayground").Parse(`
