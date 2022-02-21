@@ -10,34 +10,16 @@ import (
 	"github.com/target/goalert/util/errutil"
 )
 
+//go:embed explore.html
+var htmlStr string
+
 //go:embed build/explore.css
-var playCSS string
+var cssStr string
 
 //go:embed build/explore.js
-var playJS string
+var jsStr string
 
-var playTmpl = template.Must(template.New("graphqlPlayground").Parse(`
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui"
-    />
-    <title>{{ .ApplicationName }} - GraphQL API</title>
-    <style type="text/css">
-       {{ .PlayCSS }}
-    </style>
-  </head>
-  <body>
-    <div id="root" />
-    <script type="text/javascript">
-      {{ .PlayJS }}
-    </script>
-  </body>
-</html>
-`))
+var playTmpl = template.Must(template.New("graphqlPlayground").Parse(htmlStr))
 
 func Handler(w http.ResponseWriter, req *http.Request) {
 	var data struct {
@@ -54,8 +36,8 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 
 	cfg := config.FromContext(ctx)
 	data.ApplicationName = cfg.ApplicationName()
-	data.PlayJS = template.JS(playJS)
-	data.PlayCSS = template.CSS(playCSS)
+	data.PlayJS = template.JS(jsStr)
+	data.PlayCSS = template.CSS(cssStr)
 
 	err = playTmpl.Execute(w, data)
 	if errutil.HTTPError(ctx, w, err) {
