@@ -5,9 +5,7 @@ import (
 	_ "embed"
 	"html/template"
 	"net/http"
-	"path/filepath"
 
-	"github.com/pkg/errors"
 	"github.com/target/goalert/config"
 	"github.com/target/goalert/permission"
 	"github.com/target/goalert/util/errutil"
@@ -35,25 +33,14 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	jspath, err := filepath.Abs(filepath.Join("graphql2", "explore", "build", "explore.js"))
+	jsData, err := fs.ReadFile("build/explore.js")
 	if err != nil {
-		log.Log(ctx, errors.Wrap(err, "graphql explore js path"))
+		log.Log(ctx, err)
 		return
 	}
-	csspath, err := filepath.Abs(filepath.Join("graphql2", "explore", "build", "explore.css"))
+	cssData, err := fs.ReadFile("build/explore.css")
 	if err != nil {
-		log.Log(ctx, errors.Wrap(err, "graphql explore css path"))
-		return
-	}
-
-	jsData, err := fs.ReadFile(jspath)
-	if err != nil {
-		log.Log(ctx, errors.Wrap(err, "read graphql explore js"))
-		return
-	}
-	cssData, err := fs.ReadFile(csspath)
-	if err != nil {
-		log.Log(ctx, errors.Wrap(err, "read graphql explore css"))
+		log.Log(ctx, err)
 		return
 	}
 
