@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/stackdriver/propagation"
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/target/goalert/config"
 	"github.com/target/goalert/genericapi"
@@ -172,13 +174,28 @@ func (app *App) initHTTP(ctx context.Context) error {
 
 	mux.Handle("/api/graphql", app.graphql2.Handler())
 
-	_, js_err := os.Stat("../graphql2/explore/build/explore.js")
-	_, csserr := os.Stat("../graphql2/explore/build/explore.css")
-	if js_err == nil && csserr == nil {
-		// files exist
+	var exploreErr error
+	jspath, err := filepath.Abs(filepath.Join("graphql2", "explore", "build", "explore.js"))
+	if err != nil {
+		exploreErr = err
+	}
+	csspath, err := filepath.Abs(filepath.Join("graphql2", "explore", "build", "explore.css"))
+	if err != nil {
+		exploreErr = err
+	}
+	_, err = os.Stat(jspath)
+	if err != nil {
+		exploreErr = err
+	}
+	_, err = os.Stat(csspath)
+	if err != nil {
+		exploreErr = err
+	}
+
+	if exploreErr == nil {
 		mux.HandleFunc("/api/graphql/explore", explore.Handler)
 	} else {
-		mux.HandleFunc("/api/graphql/explore", explore.Handler)
+		log.Log(ctx, errors.Wrap(err, "register graphql explore handler"))
 	}
 
 	mux.HandleFunc("/api/v2/config", app.ConfigStore.ServeConfig)
