@@ -24,12 +24,22 @@ import { useIsWidthDown } from '../util/useWidth'
 import { isIOS } from '../util/browsers'
 
 const useStyles = makeStyles((theme) => ({
+  '@global': {
+    a: {
+      textDecoration: 'none',
+      color:
+        theme.palette.mode === 'dark' ? theme.palette.primary.main : '#cd1831',
+    },
+  },
   root: {
     flexGrow: 1,
     zIndex: 1,
     position: 'relative',
     display: 'flex',
-    backgroundColor: 'lightgrey',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? theme.palette.background.default
+        : 'lightgrey',
     height: '100%',
   },
   main: {
@@ -57,7 +67,11 @@ export default function App() {
   const authValid = useSelector(authSelector)
 
   if (!authValid) {
-    return <Login />
+    return (
+      <div className={classes.root}>
+        <Login />
+      </div>
+    )
   }
 
   let cyFormat = 'wide'
