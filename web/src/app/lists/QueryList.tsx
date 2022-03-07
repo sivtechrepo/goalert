@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import {
   useQuery,
   OperationVariables,
   QueryResult,
   DocumentNode,
 } from '@apollo/client'
-import { Grid } from '@mui/material'
+import { Card, Grid } from '@mui/material'
 import { once } from 'lodash'
 import { useLocation } from 'react-router-dom'
 import { useURLParam } from '../actions/hooks'
@@ -17,6 +17,8 @@ import ControlledPaginatedList, {
   ControlledPaginatedListProps,
 } from './ControlledPaginatedList'
 import { ImageNotSupportedSharp } from '@mui/icons-material'
+import { PageControls } from './PageControls'
+import { ListHeader } from './ListHeader'
 
 // any && object type map
 // used for objects with unknown key/values from parent
@@ -72,6 +74,7 @@ export interface _QueryListProps extends ControlledPaginatedListProps {
    *   }
    *  ```
    */
+
   query: DocumentNode
 
   // mapDataNode should map the struct from each node in `nodes` to the struct required by a PaginatedList item
@@ -102,10 +105,16 @@ export default function QueryList(props: QueryListProps): JSX.Element {
     ...listProps
   } = props
   const { input, ...vars } = variables
+  const [page, setPage] = useState(0)
 
   const [searchParam] = useURLParam('search', '')
   const { key: urlKey } = useLocation()
   const aliasedQuery = useMemo(() => fieldAlias(query, 'data'), [query])
+
+  // reset pageNumber on page reload
+  useEffect(() => {
+    setPage(0)
+  }, [urlKey])
 
   const queryVariables = {
     ...vars,
@@ -130,9 +139,26 @@ export default function QueryList(props: QueryListProps): JSX.Element {
   const nodes = data?.data?.nodes ?? []
   const items = nodes.map(mapDataNode)
   console.log('Items Length: ', items.length)
-  let loadMore: ((numberToLoad?: number) => void) | undefined
 
   // TODO, only displays when on pg1, not on pg2, which is correct behaviour
+  const itemCount = items.length
+  let loadMore: ((numberToLoad?: number) => void) | undefined
+
+  // isLoading returns true if the parent says we are, or
+  // we are currently on an incomplete page and `loadMore` is available.
+  const isLoading = (() => {
+    if (!data && loading) return true
+
+    // We are on a future/incomplete page and loadMore is true
+    if ((page + 1) * ITEMS_PER_PAGE > itemCount && loadMore) return true
+
+    return false
+  })()
+
+  const pageCount = Math.ceil(items.length / ITEMS_PER_PAGE)
+
+  if (itemCount < ITEMS_PER_PAGE && page > 0) setPage(0)
+
   if (data?.data?.pageInfo?.hasNextPage) {
     loadMore = buildFetchMore(
       fetchMore,
@@ -142,23 +168,53 @@ export default function QueryList(props: QueryListProps): JSX.Element {
     )
   }
 
-  if (
-    props.checkboxActions?.length ||
-    props.secondaryActions ||
-    !props.noSearch
-  ) {
-    // not printing from here
-
-    return (
-      <Grid container spacing={2}>
+  function renderList(): JSX.Element {
+    if (
+      props.checkboxActions?.length ||
+      props.secondaryActions ||
+      !props.noSearch
+      // not printing from here
+    ) {
+      return (
         <ControlledPaginatedList
           {...listProps}
+          listHeader={
+            <ListHeader
+              cardHeader={props.cardHeader}
+              headerNote={props.headerNote}
+              headerAction={props.headerAction}
+            />
+          }
           items={items}
           itemsPerPage={queryVariables.input.first}
+          page={page}
+          pageCount={pageCount}
+          isLoading={isLoading}
           loadMore={loadMore}
-          isLoading={!data && loading}
           noSearch={noSearch}
         />
+      )
+    }
+
+    return (
+      <Grid item xs={12}>
+        <Card>
+          <ListHeader
+            cardHeader={props.cardHeader}
+            headerNote={props.headerNote}
+            headerAction={props.headerAction}
+          />
+          <PaginatedList
+            {...listProps}
+            key={urlKey}
+            items={items}
+            page={page}
+            pageCount={pageCount}
+            isLoading={isLoading}
+            itemsPerPage={queryVariables.input.first}
+            loadMore={loadMore}
+          />
+        </Card>
       </Grid>
     )
   }
@@ -168,16 +224,16 @@ export default function QueryList(props: QueryListProps): JSX.Element {
   // only time isLoading=T, is when data=F && loading=T
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <PaginatedList
-          {...listProps}
-          key={urlKey}
-          items={items}
-          itemsPerPage={queryVariables.input.first}
+      {renderList()}
+      {!props.infiniteScroll && (
+        <PageControls
+          pageCount={pageCount}
           loadMore={loadMore}
-          isLoading={!data && loading}
+          page={page}
+          setPage={setPage}
+          isLoading={isLoading}
         />
-      </Grid>
+      )}
     </Grid>
   )
 }
