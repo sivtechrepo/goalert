@@ -8,6 +8,7 @@ CREATE TABLE daily_alert_metrics (
     id BIGSERIAL PRIMARY KEY,
     date DATE NOT NULL,
     service_id UUID NOT NULL,
+    alert_count INT DEFAULT 0 NOT NULL,
     avg_time_to_ack INTERVAL,
     avg_time_to_close INTERVAL,
     escalated_count INT DEFAULT 0 NOT NULL,
