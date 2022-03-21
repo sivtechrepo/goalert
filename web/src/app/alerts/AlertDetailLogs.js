@@ -10,6 +10,7 @@ import { DateTime } from 'luxon'
 import _ from 'lodash'
 import { formatTimeSince } from '../util/timeFormat'
 import { POLL_INTERVAL } from '../config'
+import { useTheme } from '@mui/material'
 
 const FETCH_LIMIT = 149
 const QUERY_LIMIT = 35
@@ -43,6 +44,7 @@ const useStyles = makeStyles({
 
 export default function AlertDetailLogs(props) {
   const classes = useStyles()
+  const theme = useTheme()
   const [poll, setPoll] = useState(POLL_INTERVAL)
   const { data, error, loading, fetchMore } = useQuery(query, {
     pollInterval: poll,
@@ -98,16 +100,24 @@ export default function AlertDetailLogs(props) {
   }
 
   const getLogStatusClass = (status) => {
+    let prefix = ''
     switch (status) {
       case 'OK':
-        return 'success'
+        prefix = 'success'
+        break
       case 'WARN':
-        return 'warning'
+        prefix = 'warning'
+        break
       case 'ERROR':
-        return 'error'
+        prefix = 'error'
+        break
       default:
         return null
     }
+
+    const suffix = theme.palette.mode === 'dark' ? '.light' : '.dark'
+
+    return prefix + suffix
   }
 
   const renderItem = (event, idx) => {
