@@ -15,9 +15,6 @@ const useStyles = makeStyles({
     cursor: 'pointer',
     float: 'right',
   },
-  warningColor: {
-    color: '#FFD602',
-  },
 })
 
 export function Trash() {
@@ -27,11 +24,8 @@ export function Trash() {
 
 export function Warning(props) {
   const { message, placement } = props
-  const classes = useStyles()
 
-  const warningIcon = (
-    <WarningIcon data-cy='warning-icon' className={classes.warningColor} />
-  )
+  const warningIcon = <WarningIcon data-cy='warning-icon' color='warning' />
 
   if (!message) {
     return warningIcon
