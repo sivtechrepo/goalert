@@ -13,14 +13,9 @@ type Store struct {
 }
 
 func (dp *AlertDataPoint) scanFrom(scanFn func(...interface{}) error) error {
-	hasEscalated := false
 	var timeToAck sql.NullString
 	var timeToClose sql.NullString
-	err := scanFn(&dp.ID, &dp.ServiceID, &timeToAck, &timeToClose, &hasEscalated, &dp.Timestamp)
-	// get escalated count
-	if (hasEscalated) {
-		dp.EscalatedCount = 1
-	}
+	err := scanFn(&dp.ID, &dp.ServiceID, &timeToAck, &timeToClose, &dp.Escalated, &dp.Timestamp)
 	if timeToAck.Valid {
 		dp.TimeToAck, _ = timeutil.ParseISODuration(timeToAck.String)
 	}

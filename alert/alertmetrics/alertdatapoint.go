@@ -12,6 +12,6 @@ type AlertDataPoint struct {
 	ServiceID string    `json:"service_id"`
 	TimeToAck timeutil.ISODuration `json:"time_to_ack"`
 	TimeToClose timeutil.ISODuration `json:"time_to_close"`
-	EscalatedCount int `json:"escalated_count"`
+	Escalated bool `json:"escalated"`
 	Timestamp time.Time `json:"timestamp"`
 }
