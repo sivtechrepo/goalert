@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/target/goalert/alert"
 	"github.com/target/goalert/alert/alertlog"
+	"github.com/target/goalert/alert/alertmetrics"
 	"github.com/target/goalert/assignment"
 	"github.com/target/goalert/graphql2"
 	"github.com/target/goalert/notification"
@@ -247,6 +248,13 @@ func (q *Query) AlertMetrics(ctx context.Context, opts graphql2.AlertMetricsOpti
 	if opts.RInterval.Repeat > 30 {
 		return nil, validation.NewFieldError("rInterval", "repeat count must be <= 30")
 	}
+
+	metrics, err := q.AlertMetricsStore.Search(ctx, &alertmetrics.SearchOptions{
+		ServiceIDs: opts.FilterByServiceID,
+		LowerBound: opts.RInterval.Start,
+		UpperBound: opts.RInterval.End(),
+	})
+	fmt.Println("*****", metrics)
 
 	alerts, err := q.AlertStore.Search(ctx, &alert.SearchOptions{
 		Status:    []alert.Status{alert.StatusClosed},
