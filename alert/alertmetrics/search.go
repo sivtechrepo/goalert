@@ -3,7 +3,6 @@ package alertmetrics
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"text/template"
 	"time"
 
@@ -103,7 +102,6 @@ func (s *Store) Search(ctx context.Context, opts *SearchOptions) ([]AlertDataPoi
 		}
 		metrics = append(metrics, dp)
 	}
-	fmt.Println("*****", len(metrics))
 
 	return metrics, nil
 }

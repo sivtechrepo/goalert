@@ -192,7 +192,7 @@ func (q *Query) mergeFavorites(ctx context.Context, svcs []string) ([]string, er
 
 // splitRangeByDuration maps each interval of r to an AlertDataPoint based on the given alerts.
 // The given alerts are required to be sorted by their CreatedAt field.
-func splitRangeByDuration(r timeutil.ISORInterval, alerts []alert.Alert) (result []graphql2.AlertDataPoint) {
+func splitRangeByDuration(r timeutil.ISORInterval, data []alertmetrics.AlertDataPoint) (result []graphql2.AlertDataPoint) {
 	if r.Period.IsZero() {
 		// should be handled by ISORInterval parsing/validation, but just in case
 		// prefer panic to infinite loop
@@ -201,18 +201,18 @@ func splitRangeByDuration(r timeutil.ISORInterval, alerts []alert.Alert) (result
 
 	countAlertsUntil := func(ts time.Time) int {
 		var count int
-		for len(alerts) > 0 {
-			if !alerts[0].CreatedAt.Before(ts) {
+		for len(data) > 0 {
+			if !data[0].Timestamp.Before(ts) {
 				break
 			}
 
 			count++
-			alerts = alerts[1:]
+			data = data[1:]
 		}
 		return count
 	}
 
-	// trim alerts
+	// trim alert data points
 	countAlertsUntil(r.Start)
 
 	ts := r.Start
@@ -249,29 +249,16 @@ func (q *Query) AlertMetrics(ctx context.Context, opts graphql2.AlertMetricsOpti
 		return nil, validation.NewFieldError("rInterval", "repeat count must be <= 30")
 	}
 
-	metrics, err := q.AlertMetricsStore.Search(ctx, &alertmetrics.SearchOptions{
+	data, err := q.AlertMetricsStore.Search(ctx, &alertmetrics.SearchOptions{
 		ServiceIDs: opts.FilterByServiceID,
 		LowerBound: opts.RInterval.Start,
 		UpperBound: opts.RInterval.End(),
-	})
-	fmt.Println("*****", metrics)
-
-	alerts, err := q.AlertStore.Search(ctx, &alert.SearchOptions{
-		Status:    []alert.Status{alert.StatusClosed},
-		NotBefore: opts.RInterval.Start,
-		Before:    opts.RInterval.End(),
-		ServiceFilter: alert.IDFilter{
-			IDs:   opts.FilterByServiceID,
-			Valid: true,
-		},
-		Limit: 100,
-		Sort:  alert.SortModeDateIDReverse,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return splitRangeByDuration(opts.RInterval, alerts), nil
+	return splitRangeByDuration(opts.RInterval, data), nil
 }
 
 func (q *Query) Alerts(ctx context.Context, opts *graphql2.AlertSearchOptions) (conn *graphql2.AlertConnection, err error) {
