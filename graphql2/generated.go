@@ -6480,9 +6480,9 @@ func (ec *executionContext) _AlertDataPoint_avgTimeToAck(ctx context.Context, fi
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*timeutil.ISODuration)
 	fc.Result = res
-	return ec.marshalOISODuration2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOISODuration2ᚖgithubᚗcomᚋtargetᚋgoalertᚋutilᚋtimeutilᚐISODuration(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _AlertDataPoint_avgTimetoClose(ctx context.Context, field graphql.CollectedField, obj *AlertDataPoint) (ret graphql.Marshaler) {
@@ -6512,9 +6512,9 @@ func (ec *executionContext) _AlertDataPoint_avgTimetoClose(ctx context.Context, 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*timeutil.ISODuration)
 	fc.Result = res
-	return ec.marshalOISODuration2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOISODuration2ᚖgithubᚗcomᚋtargetᚋgoalertᚋutilᚋtimeutilᚐISODuration(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _AlertDataPoint_escalatedCount(ctx context.Context, field graphql.CollectedField, obj *AlertDataPoint) (ret graphql.Marshaler) {
@@ -30308,20 +30308,20 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalOISODuration2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+func (ec *executionContext) unmarshalOISODuration2ᚖgithubᚗcomᚋtargetᚋgoalertᚋutilᚋtimeutilᚐISODuration(ctx context.Context, v interface{}) (*timeutil.ISODuration, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := graphql.UnmarshalString(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	var res = new(timeutil.ISODuration)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOISODuration2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+func (ec *executionContext) marshalOISODuration2ᚖgithubᚗcomᚋtargetᚋgoalertᚋutilᚋtimeutilᚐISODuration(ctx context.Context, sel ast.SelectionSet, v *timeutil.ISODuration) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(*v)
-	return res
+	return v
 }
 
 func (ec *executionContext) unmarshalOISOTimestamp2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
