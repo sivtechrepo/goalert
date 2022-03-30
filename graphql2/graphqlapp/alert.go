@@ -199,9 +199,11 @@ func splitRangeByDuration(r timeutil.ISORInterval, data []alertmetrics.AlertData
 		panic("duration must not be zero")
 	}
 
-	countMetricsUntil := func(ts time.Time) (int, int) {
+	calculateMetricsUntil := func(ts time.Time) (int, int, timeutil.ISODuration, timeutil.ISODuration) {
 		var alertCount int
 		var escalatedCount int
+		var avgTimeToAck float64
+		var avgTimeToClose float64
 		for len(data) > 0 {
 			if !data[0].Timestamp.Before(ts) {
 				break
@@ -209,15 +211,17 @@ func splitRangeByDuration(r timeutil.ISORInterval, data []alertmetrics.AlertData
 			if data[0].Escalated {
 				escalatedCount++
 			}
+			avgTimeToAck += float64(data[0].TimeToAck)
+			avgTimeToClose += float64(data[0].TimeToClose)
 
 			alertCount++
 			data = data[1:]
 		}
-		return alertCount, escalatedCount
+		return alertCount, escalatedCount, timeutil.ISODuration{TimePart: time.Duration(avgTimeToAck / float64(alertCount))}, timeutil.ISODuration{TimePart: time.Duration(avgTimeToClose/ float64(alertCount))}
 	}
 
 	// trim alert data points
-	countMetricsUntil(r.Start)
+	calculateMetricsUntil(r.Start)
 
 	ts := r.Start
 	end := r.End()
@@ -226,11 +230,13 @@ func splitRangeByDuration(r timeutil.ISORInterval, data []alertmetrics.AlertData
 		if next.After(end) {
 			next = end
 		}
-		alertCount, escalatedCount := countMetricsUntil(next)
+		alertCount, escalatedCount, avgTimeToAck, avgTimeToClose := calculateMetricsUntil(next)
 		result = append(result, graphql2.AlertDataPoint{
 			Timestamp:  ts,
 			AlertCount: alertCount,
 			EscalatedCount: escalatedCount,
+			AvgTimeToAck: &avgTimeToAck,
+			AvgTimetoClose: &avgTimeToClose,
 		})
 		ts = next
 	}

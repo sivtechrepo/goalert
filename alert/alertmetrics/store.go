@@ -3,9 +3,9 @@ package alertmetrics
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/target/goalert/util"
-	"github.com/target/goalert/util/timeutil"
 )
 
 type Store struct {
@@ -13,14 +13,14 @@ type Store struct {
 }
 
 func (dp *AlertDataPoint) scanFrom(scanFn func(...interface{}) error) error {
-	var timeToAck sql.NullString
-	var timeToClose sql.NullString
+	var timeToAck sql.NullFloat64
+	var timeToClose sql.NullFloat64
 	err := scanFn(&dp.ID, &dp.ServiceID, &timeToAck, &timeToClose, &dp.Escalated, &dp.Timestamp)
 	if timeToAck.Valid {
-		dp.TimeToAck, _ = timeutil.ParseISODuration(timeToAck.String)
+		dp.TimeToAck = time.Duration(timeToAck.Float64 * float64(time.Second))
 	}
 	if timeToClose.Valid {
-		dp.TimeToClose, _ = timeutil.ParseISODuration(timeToClose.String)
+		dp.TimeToClose = time.Duration(timeToClose.Float64 * float64(time.Second))
 	}
 	return err
 }

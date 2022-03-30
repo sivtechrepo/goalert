@@ -29,8 +29,8 @@ var searchTemplate = template.Must(template.New("alert-metrics-search").Funcs(se
 	SELECT
 		am.alert_id,
 		am.service_id,
-		am.time_to_ack,
-		am.time_to_close,
+		EXTRACT(EPOCH FROM am.time_to_ack),
+		EXTRACT(EPOCH FROM am.time_to_close),
 		am.escalated,
 		a.created_at
 	FROM alert_metrics am
