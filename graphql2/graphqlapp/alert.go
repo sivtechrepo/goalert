@@ -217,7 +217,7 @@ func splitRangeByDuration(r timeutil.ISORInterval, data []alertmetrics.AlertData
 			alertCount++
 			data = data[1:]
 		}
-		return alertCount, escalatedCount, timeutil.ISODuration{TimePart: time.Duration(avgTimeToAck / float64(alertCount))}, timeutil.ISODuration{TimePart: time.Duration(avgTimeToClose/ float64(alertCount))}
+		return alertCount, escalatedCount, timeutil.ISODuration{TimePart: time.Duration(avgTimeToAck / float64(alertCount))}, timeutil.ISODuration{TimePart: time.Duration(avgTimeToClose / float64(alertCount))}
 	}
 
 	// trim alert data points
@@ -232,10 +232,10 @@ func splitRangeByDuration(r timeutil.ISORInterval, data []alertmetrics.AlertData
 		}
 		alertCount, escalatedCount, avgTimeToAck, avgTimeToClose := calculateMetricsUntil(next)
 		result = append(result, graphql2.AlertDataPoint{
-			Timestamp:  ts,
-			AlertCount: alertCount,
+			Timestamp:      ts,
+			AlertCount:     alertCount,
 			EscalatedCount: escalatedCount,
-			AvgTimeToAck: &avgTimeToAck,
+			AvgTimeToAck:   &avgTimeToAck,
 			AvgTimetoClose: &avgTimeToClose,
 		})
 		ts = next
