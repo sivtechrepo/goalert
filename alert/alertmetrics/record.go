@@ -4,9 +4,12 @@ import (
 	"time"
 )
 
-// A Record is a recording of an Alert metric.
+// A Record is a daily aggregate of alert metrics for a given service.
 type Record struct {
-	AlertID   int
-	ServiceID string
-	ClosedAt  time.Time
+	ServiceID      string
+	Date           time.Time
+	AlertCount     int
+	AvgTimeToAck   time.Duration
+	AvgTimeToClose time.Duration
+	EscalatedCount int
 }

@@ -25,26 +25,60 @@ type SearchOptions struct {
 	Until time.Time `json:"b,omitempty"`
 }
 
-var searchTemplate = template.Must(template.New("alert-metrics-search").Funcs(search.Helpers()).Parse(`
+var searchTemplate = template.Must(template.New("alert-metrics-search").Parse(`
 	SELECT
-		alert_id,
 		service_id,
-		closed_at
-	FROM alert_metrics
+		date,
+		alert_count,
+		coalesce(avg_time_to_ack, avg_time_to_close),
+		avg_time_to_close,
+		escalated_count
+	FROM daily_alert_metrics
 	WHERE true
 	{{if .ServiceIDs}}
 		AND service_id = any(:services)
 	{{end}}
 	{{ if not .Until.IsZero }}
-		AND (date(timezone('UTC'::text, closed_at))) < :until
+		AND date < :until
 	{{ end }}
 	{{ if not .Since.IsZero }}
-		AND (date(timezone('UTC'::text, closed_at))) >= :since
+		AND date >= :since
 	{{ end }}
-	ORDER BY (date(timezone('UTC'::text, closed_at)))
+	ORDER BY date
+
+	// TODO fix syntax: if since >= nowdate and until > nowdate
+	{{if and le .Since .NowDate gt .Until .NowDate}}
+		UNION ALL
+
+		SELECT
+			service_id,
+			closed_at::date,
+			count(*),
+			coalesce(avg(time_to_ack), avg(time_to_close)),
+			avg(time_to_close),
+			count(*) filter (where escalated=true)
+		FROM alert_metrics
+		WHERE true
+		{{if .ServiceIDs}}
+			AND service_id = any(:services)
+		{{end}}
+		{{ if not .Until.IsZero }}
+			AND (date(timezone('UTC'::text, closed_at))) < :until
+		{{ end }}
+		{{ if not .Since.IsZero }}
+			AND (date(timezone('UTC'::text, closed_at))) >= :since
+		{{ end }}
+		GROUP BY service_id, closed_at
+		ORDER BY (date(timezone('UTC'::text, closed_at)))
+	{{ end }}
 `))
 
-type renderData SearchOptions
+type renderData struct {
+	SearchOptions
+
+	// NowDate is the database's now()::date
+	NowDate time.Time
+}
 
 func (opts renderData) Normalize() (*renderData, error) {
 	err := validate.ManyUUID("Services", opts.ServiceIDs, 50)
@@ -71,7 +105,25 @@ func (s *Store) Search(ctx context.Context, opts *SearchOptions) ([]Record, erro
 		opts = new(SearchOptions)
 	}
 
-	data, err := (*renderData)(opts).Normalize()
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	var nowDate time.Time
+	err = tx.StmtContext(ctx, s.nowDate).QueryRowContext(ctx).Scan(&nowDate)
+	if err != nil {
+		return nil, errors.Wrap(err, "get nowDate")
+	}
+
+	rd := renderData{}
+	rd.Since = opts.Since
+	rd.Until = opts.Until
+	rd.ServiceIDs = opts.ServiceIDs
+	rd.NowDate = nowDate
+
+	data, err := rd.Normalize()
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +133,7 @@ func (s *Store) Search(ctx context.Context, opts *SearchOptions) ([]Record, erro
 		return nil, errors.Wrap(err, "render query")
 	}
 
-	rows, err := s.db.QueryContext(ctx, query, args...)
+	rows, err := tx.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, errors.Wrap(err, "query")
 	}
@@ -89,12 +141,12 @@ func (s *Store) Search(ctx context.Context, opts *SearchOptions) ([]Record, erro
 
 	metrics := make([]Record, 0)
 	for rows.Next() {
-		var dp Record
-		err := rows.Scan(&dp.AlertID, &dp.ServiceID, &dp.ClosedAt)
+		var r Record
+		err := rows.Scan(&r.ServiceID, &r.Date, &r.AlertCount, &r.AvgTimeToAck, &r.AvgTimeToClose, &r.EscalatedCount)
 		if err != nil {
 			return nil, err
 		}
-		metrics = append(metrics, dp)
+		metrics = append(metrics, r)
 	}
 
 	return metrics, nil

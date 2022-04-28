@@ -202,7 +202,7 @@ func splitRangeByDuration(r timeutil.ISORInterval, metrics []alertmetrics.Record
 	countAlertsUntil := func(ts time.Time) int {
 		var count int
 		for len(metrics) > 0 {
-			if !metrics[0].ClosedAt.Before(ts) {
+			if !metrics[0].Date.Before(ts) {
 				break
 			}
 
