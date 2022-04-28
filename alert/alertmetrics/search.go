@@ -46,7 +46,7 @@ var searchTemplate = template.Must(template.New("alert-metrics-search").Parse(`
 	{{ end }}
 	ORDER BY date
 
-	// TODO fix syntax: if since >= nowdate and until > nowdate
+	// TODO fix syntax: if since <= nowdate and until > nowdate
 	{{if and le .Since .NowDate gt .Until .NowDate}}
 		UNION ALL
 
