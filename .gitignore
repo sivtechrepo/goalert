@@ -2,6 +2,8 @@
 /setup.cfg
 /setup.pid
 /config.json.bak
+/storageState.json
+
 
 *.pem
 *.key

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"io"
+	"sync"
 )
 
 type prefixer struct {
@@ -23,7 +24,11 @@ func (w *prefixer) writePrefix() error {
 	return err
 }
 
+var mx sync.Mutex
+
 func (w *prefixer) Write(p []byte) (int, error) {
+	mx.Lock()
+	defer mx.Unlock()
 	var n int
 	for {
 		l := bytes.IndexByte(p, '\n')
