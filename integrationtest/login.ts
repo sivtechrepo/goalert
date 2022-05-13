@@ -1,9 +1,12 @@
 import { Page } from '@playwright/test'
 
+export const adminSession = 'admin.session.json'
+export const userSession = 'user.session.json'
+
 export async function login(
   page: Page,
-  user = 'admin',
-  pass = 'admin123',
+  user: string,
+  pass: string,
 ): Promise<void> {
   await page.fill('input[name=username]', user)
   await page.fill('input[name=password]', pass)

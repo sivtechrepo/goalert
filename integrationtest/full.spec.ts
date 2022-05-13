@@ -1,35 +1,33 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   login,
-  logout,
   newTestUser,
   deleteUser,
   createService,
   deleteService,
+  User,
 } from './util'
 
 import Chance from 'chance'
+import { adminSession } from './login'
 const c = new Chance()
+
+let u: User
+test.beforeAll(async ({ browser }) => {
+  // Create page yourself and sign in.
+  const page = await browser.newPage({ storageState: adminSession })
+  page.goto('/')
+  u = await newTestUser(page)
+})
+test.afterAll(async ({ browser }) => {
+  // Create page yourself and sign in.
+  const page = await browser.newPage({ storageState: adminSession })
+  page.goto('/')
+  await deleteUser(page, u.name)
+})
 
 test('everything', async ({ page, browser }) => {
   await page.goto('./')
-  const u = await newTestUser(page)
-
-  // click on admin
-  await page.locator('nav a', { hasText: 'Admin' }).click()
-  // click on SMTP header
-  await page.click('h2 >> "SMTP"')
-  await page.check('input[name="SMTP.Enable"]')
-  await page.fill('input[name="SMTP.From"]', 'goalert-test@localhost')
-  await page.fill('input[name="SMTP.Address"]', 'localhost:1025')
-  await page.check('input[name="SMTP.DisableTLS"]')
-  // save and confirm
-  if (await page.locator('button >> "Save"').isEnabled()) {
-    await page.click('button >> "Save"')
-    await page.click('button >> "Confirm"')
-  }
-
-  await logout(page)
   await login(page, u.name, u.pass)
 
   // manage profile
@@ -45,8 +43,22 @@ test('everything', async ({ page, browser }) => {
   await page.click('button >> "Submit"')
 
   // get verification code in new browser page
-  const mailPage = await browser.newPage()
+  const mailPage = await page.context().newPage()
   await mailPage.goto(`http://localhost:8025`)
+
+  await expect
+    .poll(
+      async () => {
+        await mailPage.click('button[title="Refresh"]')
+        return await mailPage.locator(`div >> "${addr}"`).first().isVisible()
+      },
+      {
+        message: 'wait for verification code email',
+        timeout: 10000,
+      },
+    )
+    .toBe(true)
+
   await mailPage.click(`div >> "${addr}"`)
   const codeSrc = (await mailPage
     .locator('#preview-plain')
@@ -105,7 +117,4 @@ test('everything', async ({ page, browser }) => {
   await mailPage.close()
 
   await deleteService(page, svc.name)
-  await logout(page)
-  await login(page)
-  await deleteUser(page, u.name)
 })

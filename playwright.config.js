@@ -6,7 +6,6 @@ const config = {
   use: {
     trace: 'on-first-retry',
     baseURL: 'http://localhost:3040',
-    storageState: 'storageState.json',
   },
   projects: [
     {

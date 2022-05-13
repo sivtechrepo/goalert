@@ -39,6 +39,7 @@ export async function simpleDelete(
   await gotoDetails(page, category, name)
   await page.locator('[aria-label="Delete"]').click()
   await page.locator('button >> "Confirm"').click()
+  await expect(await page.locator('h1', { hasText: category })).toBeVisible()
 }
 
 export async function simpleCreate(
@@ -54,6 +55,11 @@ export async function simpleCreate(
     await page.locator('input[name="' + key + '"]').fill(details[key])
   }
   await page.locator('button >> "Submit"').click()
+  await expect(
+    await page.locator('h1', {
+      hasText: category.replace(/s$/, '') + ' Details',
+    }),
+  ).toBeVisible()
 
   return page.url().split('/').pop() as string
 }
