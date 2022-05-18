@@ -1,5 +1,6 @@
 import { chromium, FullConfig } from '@playwright/test'
 import { adminSession, userSession, login } from './login'
+import { adminUser, normalUser } from './util'
 
 export default async function globalSetup(config: FullConfig): Promise<void> {
   const browser = await chromium.launch()
@@ -15,7 +16,7 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
     await page.goto('./')
     await login(page, user, pass)
     await page.context().storageState({ path })
-    if (user !== 'admin') {
+    if (user !== 'test.admin') {
       return
     }
 
@@ -35,8 +36,8 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
   }
 
   await Promise.all([
-    createSession(adminSession, 'admin', 'admin123'),
-    createSession(userSession, 'user', 'user1234'),
+    createSession(adminSession, adminUser.name, adminUser.pass),
+    createSession(userSession, normalUser.name, normalUser.pass),
   ])
 
   await browser.close()

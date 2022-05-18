@@ -19,6 +19,8 @@ type Config struct {
 	APIOnly     bool
 	LogEngine   bool
 
+	EngineInterval time.Duration
+
 	TLSListenAddr string
 	TLSConfig     *tls.Config
 

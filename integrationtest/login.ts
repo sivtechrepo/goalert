@@ -1,7 +1,17 @@
 import { Page } from '@playwright/test'
+import { User } from './util'
 
 export const adminSession = 'admin.session.json'
 export const userSession = 'user.session.json'
+
+export const adminUser = {
+  name: 'test.admin',
+  pass: 'test.admin123',
+}
+export const normalUser = {
+  name: 'test.user',
+  pass: 'test.user1234',
+}
 
 export async function login(
   page: Page,

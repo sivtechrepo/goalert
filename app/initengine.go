@@ -10,7 +10,6 @@ import (
 )
 
 func (app *App) initEngine(ctx context.Context) error {
-
 	var regionIndex int
 	err := app.db.QueryRowContext(ctx, `SELECT id FROM region_ids WHERE name = $1`, app.cfg.RegionName).Scan(&regionIndex)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -40,6 +39,8 @@ func (app *App) initEngine(ctx context.Context) error {
 		NCStore:             app.NCStore,
 		OnCallStore:         app.OnCallStore,
 		ScheduleStore:       app.ScheduleStore,
+
+		Interval: app.cfg.EngineInterval,
 
 		ConfigSource: app.ConfigStore,
 

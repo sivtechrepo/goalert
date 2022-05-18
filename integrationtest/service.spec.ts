@@ -28,6 +28,29 @@ test('editing a service', async ({ page }) => {
   await deleteService(page, newName)
 })
 
+test('graphql', async ({ page }) => {
+  await page.goto('./api/graphql/explore')
+  await page.click('[aria-label="Query Editor"]')
+  await page.keyboard.press('Control+A')
+  await page.keyboard.type('qu')
+  await expect(page.locator('#cm-complete-0-0')).toHaveText('query')
+  await page.keyboard.press('Enter')
+  await page.keyboard.type('{')
+  await page.keyboard.press('Enter')
+  await page.keyboard.type('u')
+  await page.locator('#cm-complete-0').locator('li >> "user"').click()
+  await expect(
+    await page.locator('span.cm-property', { hasText: 'user' }),
+  ).toBeVisible()
+  await page.fill('.query-editor textarea', '{name}')
+  await page.waitForTimeout(100) // graphiql has a hard-coded 100ms change delay, we need to match it before running the query
+  await page.keyboard.press('Control+Enter')
+
+  await expect(page.locator('.result-window')).toContainText('test.user', {
+    timeout: 3000,
+  })
+})
+
 test('integration keys', async ({ page }) => {
   await page.goto('./')
   const svc = await createService(page)

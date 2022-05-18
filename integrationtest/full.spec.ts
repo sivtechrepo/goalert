@@ -69,7 +69,7 @@ test('everything', async ({ page, browser }) => {
     throw new Error('could not find verification code')
   }
   const code = m[0]
-
+  await page.bringToFront()
   await page.fill('input[name=code]', code)
   await page.click('button >> "Submit"')
 
@@ -97,8 +97,10 @@ test('everything', async ({ page, browser }) => {
     }),
   ).toBeVisible({ timeout: 10000 })
   await alertTab.close()
+  await page.bringToFront()
   await page.click('button >> "Done"')
 
+  await mailPage.bringToFront()
   await mailPage.locator('li a', { hasText: 'Inbox' }).click()
   await mailPage.locator(`div.msglist-message`, { hasText: summary }).click()
 
@@ -116,5 +118,6 @@ test('everything', async ({ page, browser }) => {
   await mailAlertTab.close()
   await mailPage.close()
 
+  await page.bringToFront()
   await deleteService(page, svc.name)
 })

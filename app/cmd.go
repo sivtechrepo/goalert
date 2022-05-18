@@ -639,6 +639,8 @@ func getConfig(ctx context.Context) (Config, error) {
 		Verbose:     viper.GetBool("verbose"),
 		APIOnly:     viper.GetBool("api-only"),
 
+		EngineInterval: viper.GetDuration("engine-interval"),
+
 		DBMaxOpen: viper.GetInt("db-max-open"),
 		DBMaxIdle: viper.GetInt("db-max-idle"),
 
@@ -715,6 +717,7 @@ func init() {
 	RootCmd.Flags().String("sysapi-cert-file", "", "(Experimental) Specifies a path to a PEM-encoded certificate to use when connecting to plugin services.")
 	RootCmd.Flags().String("sysapi-key-file", "", "(Experimental) Specifies a path to a PEM-encoded private key file use when connecting to plugin services.")
 	RootCmd.Flags().String("sysapi-ca-file", "", "(Experimental) Specifies a path to a PEM-encoded certificate(s) to authorize connections from plugin services.")
+	RootCmd.Flags().Duration("engine-interval", 5*time.Second, "Minimum interval between engine cycles.")
 
 	RootCmd.PersistentFlags().StringP("listen-prometheus", "p", "", "Bind address for Prometheus metrics.")
 

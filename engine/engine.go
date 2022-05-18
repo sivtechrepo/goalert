@@ -254,6 +254,7 @@ func (p *Engine) Pause(ctx context.Context) error {
 
 	return p.mgr.Pause(ctx)
 }
+
 func (p *Engine) _pause(ctx context.Context) error {
 	ch := make(chan error, 1)
 
@@ -277,6 +278,7 @@ func (p *Engine) _pause(ctx context.Context) error {
 func (p *Engine) Resume(ctx context.Context) error {
 	return p.mgr.Resume(ctx)
 }
+
 func (p *Engine) _resume(ctx context.Context) error {
 	// nothing to be done `p.mgr.IsPaused` will already
 	// return false
@@ -298,6 +300,7 @@ func (p *Engine) Shutdown(ctx context.Context) error {
 
 	return p.mgr.Shutdown(ctx)
 }
+
 func (p *Engine) _shutdown(ctx context.Context) error {
 	close(p.shutdownCh)
 	<-p.runLoopExit
@@ -538,6 +541,7 @@ passSignals:
 	metricModuleDuration.WithLabelValues("Engine").Observe(time.Since(startAll).Seconds())
 	metricCycleTotal.Inc()
 }
+
 func (p *Engine) handlePause(ctx context.Context, respCh chan error) {
 	// nothing special to do currently
 	respCh <- nil
@@ -564,7 +568,7 @@ func (p *Engine) _run(ctx context.Context) error {
 		}
 	}
 
-	alertTicker := time.NewTicker(5 * time.Second)
+	alertTicker := time.NewTicker(p.cfg.Interval)
 	defer alertTicker.Stop()
 
 	defer close(p.triggerCh)

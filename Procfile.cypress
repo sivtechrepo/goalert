@@ -1,7 +1,7 @@
 build: while true; do make -qs bin/goalert || make bin/goalert || (echo '\033[0;31mBuild Failure'; sleep 3); sleep 0.1; done
 
 @watch-file=./bin/goalert
-goalert: go run ./devtools/waitfor postgres://postgres@localhost:5433 && bin/goalert migrate --db-url=postgres://postgres@localhost:5433 && bin/goalert add-user --admin --user admin --pass admin123 --db-url=postgres://postgres@localhost:5433 && bin/goalert add-user --user user --pass user1234 --db-url=postgres://postgres@localhost:5433 && go run ./devtools/procwrap -test=localhost:3042 bin/goalert -l=localhost:3042 --ui-dir=web/src/build --db-url=postgres://postgres@localhost:5433 --slack-base-url=http://localhost:3040/slack --log-errors-only
+goalert: go run ./devtools/waitfor postgres://postgres@localhost:5433 && bin/goalert migrate --db-url=postgres://postgres@localhost:5433 && bin/goalert add-user --admin --user admin --pass admin123 --db-url=postgres://postgres@localhost:5433 && bin/goalert add-user --admin --user test.admin --pass test.admin123 --db-url=postgres://postgres@localhost:5433 && bin/goalert add-user --user test.user --pass test.user1234 --db-url=postgres://postgres@localhost:5433 && go run ./devtools/procwrap -test=localhost:3042 bin/goalert --engine-interval=100ms -l=localhost:3042 --ui-dir=web/src/build --db-url=postgres://postgres@localhost:5433 --slack-base-url=http://localhost:3040/slack --log-errors-only
 
 @watch-file=./web/src/esbuild.config.js
 ui: yarn workspace goalert-web run esbuild --watch

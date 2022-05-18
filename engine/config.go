@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"time"
+
 	"github.com/target/goalert/alert"
 	"github.com/target/goalert/alert/alertlog"
 	"github.com/target/goalert/config"
@@ -24,6 +26,8 @@ type Config struct {
 	NCStore             *notificationchannel.Store
 	OnCallStore         *oncall.Store
 	ScheduleStore       *schedule.Store
+
+	Interval time.Duration
 
 	ConfigSource config.Source
 
