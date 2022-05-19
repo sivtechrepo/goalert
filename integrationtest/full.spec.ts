@@ -18,12 +18,14 @@ test.beforeAll(async ({ browser }) => {
   const page = await browser.newPage({ storageState: adminSession })
   page.goto('/')
   u = await newTestUser(page)
+  await page.close()
 })
 test.afterAll(async ({ browser }) => {
   // Create page yourself and sign in.
   const page = await browser.newPage({ storageState: adminSession })
   page.goto('/')
   await deleteUser(page, u.name)
+  await page.close()
 })
 
 test('everything', async ({ page, browser }) => {
