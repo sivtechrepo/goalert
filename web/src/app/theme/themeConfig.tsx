@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react'
 import { PaletteOptions } from '@mui/material/styles/createPalette'
-import { isCypress } from '../env'
+import { isCI } from '../env'
 import {
   createTheme,
   Theme,
@@ -58,7 +58,7 @@ function getPalette(mode: MUIThemeMode): PaletteOptions {
 
 function makeTheme(mode: MUIThemeMode): Theme {
   let testOverrides = {}
-  if (isCypress) {
+  if (isCI) {
     testOverrides = {
       transitions: {
         // So we have `transition: none;` everywhere

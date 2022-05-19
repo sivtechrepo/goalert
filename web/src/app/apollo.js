@@ -186,8 +186,11 @@ const cache = new InMemoryCache({
 })
 
 const queryOpts = { fetchPolicy: 'cache-and-network', errorPolicy: 'all' }
-if (new URLSearchParams(location.search).get('poll') !== '0') {
-  queryOpts.pollInterval = POLL_INTERVAL
+const pollInterval = +(
+  new URLSearchParams(location.search).get('poll') || POLL_INTERVAL
+)
+if (pollInterval !== 0) {
+  queryOpts.pollInterval = pollInterval
 }
 
 export const GraphQLClient = new ApolloClient({

@@ -62,9 +62,12 @@ const refetchExchange = (): Exchange => {
 // refetch every 15 sec or on refocus
 let poll: NodeJS.Timer
 function resetPoll(): void {
-  if (new URLSearchParams(location.search).get('poll') === '0') return
+  const pollInterval = +(
+    new URLSearchParams(location.search).get('poll') || 15000
+  )
+  if (pollInterval === 0) return
   clearInterval(poll)
-  poll = setInterval(refetchAll, 15000)
+  poll = setInterval(refetchAll, pollInterval)
 }
 window.addEventListener('visibilitychange', () => {
   switch (document.visibilityState) {
