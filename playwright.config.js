@@ -6,7 +6,8 @@ const config = {
   use: {
     trace: 'on-first-retry',
     baseURL: 'http://localhost:3040',
-    viewport: { width: 720, height: 900 },
+    viewport: { width: 1440, height: 900 },
+    timezoneId: 'America/Chicago',
     launchOptions: {
       // slowMo: 1000,
     },
@@ -22,7 +23,7 @@ const config = {
     {
       name: 'chromium-mobile',
       use: {
-        ...devices['Desktop Chrome'],
+        ...devices['Pixel 5'],
         viewportSize: { width: 375, height: 667 },
       },
     },
