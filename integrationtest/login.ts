@@ -1,5 +1,4 @@
 import { Page } from '@playwright/test'
-import { User } from './util'
 
 export const adminSession = 'admin.session.json'
 export const userSession = 'user.session.json'

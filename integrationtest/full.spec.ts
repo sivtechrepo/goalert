@@ -28,7 +28,7 @@ test.afterAll(async ({ browser }) => {
   await page.close()
 })
 
-test('everything', async ({ page, browser }) => {
+test('everything', async ({ page }) => {
   await page.goto('./')
   await login(page, u.name, u.pass)
 
