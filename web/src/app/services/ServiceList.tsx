@@ -37,7 +37,7 @@ export default function ServiceList(): JSX.Element {
         url: n.id,
         isFavorite: n.isFavorite,
       })}
-      createForm={<ServiceCreateDialog />}
+      CreateComponent={ServiceCreateDialog as React.FC<{ onClose: () => void }>}
       createLabel='Service'
       searchAdornment={
         <ServiceLabelFilterContainer

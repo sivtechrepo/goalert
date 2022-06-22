@@ -1,33 +1,34 @@
-import React, { useState, ReactElement } from 'react'
+import React, { useState, Component, FC } from 'react'
 import QueryList, { QueryListProps } from './QueryList'
 import CreateFAB from './CreateFAB'
 
+type CreateComponentType = React.FC<{ onClose: () => void }>
+
 interface SimpleListPageProps extends QueryListProps {
-  createForm: ReactElement
+  CreateComponent?: CreateComponentType
   createLabel: string
 }
 
 export default function SimpleListPage(
   props: SimpleListPageProps,
 ): JSX.Element {
-  const { createForm, createLabel, ...rest } = props
+  const { CreateComponent, createLabel, ...rest } = props
   const [create, setCreate] = useState(false)
 
   return (
     <React.Fragment>
       <QueryList {...rest} />
 
-      {createForm && (
+      {CreateComponent && (
         <CreateFAB
           onClick={() => setCreate(true)}
           title={`Create ${createLabel}`}
         />
       )}
 
-      {create &&
-        React.cloneElement(createForm, {
-          onClose: () => setCreate(false),
-        })}
+      {CreateComponent && create && (
+        <CreateComponent onClose={() => setCreate(false)} />
+      )}
     </React.Fragment>
   )
 }
